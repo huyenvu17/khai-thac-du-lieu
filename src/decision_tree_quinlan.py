@@ -2,7 +2,7 @@ from typing import Dict, List
 import pandas as pd
 
 
-def run_dt_c45(
+def run_dt_quinlan(
     df: pd.DataFrame,
     target: str,
     feature_columns: List[str] | None = None,
@@ -15,6 +15,7 @@ def run_dt_c45(
     Lưu ý: đây là giản lược cho mục tiêu học tập nhanh.
     """
     from sklearn.tree import DecisionTreeClassifier
+    from sklearn.preprocessing import LabelEncoder
     from sklearn.metrics import confusion_matrix
     from .utils import train_test_split_df, compute_classification_metrics
 
@@ -26,8 +27,16 @@ def run_dt_c45(
         used_df = df[numeric_cols + [target]].dropna()
         feature_columns = numeric_cols
 
+    # Xử lý categorical features
+    processed_df = used_df.copy()
+    
+    for col in feature_columns:
+        if used_df[col].dtype == 'object':  # Categorical column
+            le = LabelEncoder()
+            processed_df[col] = le.fit_transform(used_df[col].astype(str))
+
     X_train, X_test, y_train, y_test = train_test_split_df(
-        used_df, target=target, test_size=test_size, random_state=random_state
+        processed_df, target=target, test_size=test_size, random_state=random_state
     )
 
     model = DecisionTreeClassifier(
@@ -41,5 +50,3 @@ def run_dt_c45(
     metrics["confusion_matrix"] = cm.tolist()
     metrics["features"] = feature_columns
     return metrics
-
-

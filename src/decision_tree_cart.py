@@ -1,8 +1,8 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import pandas as pd
 
 
-def run_dt_id3(
+def run_dt_cart(
     df: pd.DataFrame,
     target: str,
     feature_columns: List[str] | None = None,
@@ -12,6 +12,7 @@ def run_dt_id3(
     random_state: int = 42,
 ) -> Dict:
     from sklearn.tree import DecisionTreeClassifier
+    from sklearn.preprocessing import LabelEncoder
     from sklearn.metrics import confusion_matrix
     from .utils import train_test_split_df, compute_classification_metrics
 
@@ -23,12 +24,20 @@ def run_dt_id3(
         used_df = df[numeric_cols + [target]].dropna()
         feature_columns = numeric_cols
 
+    # Xử lý categorical features
+    processed_df = used_df.copy()
+    
+    for col in feature_columns:
+        if used_df[col].dtype == 'object':  # Categorical column
+            le = LabelEncoder()
+            processed_df[col] = le.fit_transform(used_df[col].astype(str))
+
     X_train, X_test, y_train, y_test = train_test_split_df(
-        used_df, target=target, test_size=test_size, random_state=random_state
+        processed_df, target=target, test_size=test_size, random_state=random_state
     )
 
     model = DecisionTreeClassifier(
-        criterion="entropy", max_depth=max_depth, min_samples_split=min_samples_split, random_state=random_state
+        criterion="gini", max_depth=max_depth, min_samples_split=min_samples_split, random_state=random_state
     )
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
