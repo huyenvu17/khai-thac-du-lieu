@@ -70,30 +70,21 @@ def main():
         return
 
     st.subheader("Dữ liệu sử dụng")
-    with st.expander("📊 Xem dữ liệu Fashion Retail Sales", expanded=False):
+    with st.expander("Dữ liệu Fashion Retail Sales", expanded=False):
         st.dataframe(data_df)
 
     # Hiển thị dữ liệu đầu vào cho thuật toán được chọn
     if algo == "K-means":
-        # Chuẩn bị dữ liệu cho K-means theo mùa
-        if 'Date Purchase' in data_df.columns and 'Purchase Amount (USD)' in data_df.columns:
-            # Tạo cột Quarter từ Date Purchase
-            kmeans_data = data_df.copy()
-            kmeans_data['Date Purchase'] = pd.to_datetime(kmeans_data['Date Purchase'], format='%d-%m-%Y')
-            kmeans_data['Quarter'] = kmeans_data['Date Purchase'].dt.quarter
+        # Chuẩn bị dữ liệu cho K-means phân nhóm khách hàng
+        if 'Purchase Amount (USD)' in data_df.columns and 'Review Rating' in data_df.columns:
+            # Xử lý missing values
+            kmeans_data = data_df.dropna(subset=['Purchase Amount (USD)', 'Review Rating']).copy()
             
-            # Chọn features cho K-means
-            feature_cols = ['Purchase Amount (USD)', 'Quarter']
-            if 'Review Rating' in kmeans_data.columns:
-                # Xử lý missing values trong Review Rating
-                kmeans_data = kmeans_data.dropna(subset=['Review Rating'])
-                feature_cols.append('Review Rating')
-            
-            st.write("**📋 Dữ liệu đầu vào (K-means):**")
-            kmeans_input = kmeans_data[['Customer Reference ID', 'Purchase Amount (USD)', 'Quarter'] + (['Review Rating'] if 'Review Rating' in kmeans_data.columns else [])].copy()
+            st.write("**Dữ liệu đầu vào (K-means):**")
+            kmeans_input = kmeans_data[['Customer Reference ID', 'Purchase Amount (USD)', 'Review Rating']].copy()
             st.dataframe(kmeans_input.head(20))
         else:
-            st.error("Dữ liệu không có cột 'Date Purchase' hoặc 'Purchase Amount (USD)'")
+            st.error("Dữ liệu không có cột 'Purchase Amount (USD)' hoặc 'Review Rating'")
 
 
 
@@ -101,78 +92,95 @@ def main():
 
     # Phần chạy thuật toán K-means
     if algo == "K-means":
-        st.subheader("Chiến lược Marketing theo Mùa - K-means")
-        st.write("**Mục tiêu:** Phân nhóm khách hàng theo mùa mua hàng (Q1-Q4)")
+        st.subheader("Phân Nhóm Khách Hàng - K-means")
+        st.write("**Mục tiêu:** Phân nhóm khách hàng theo mức chi tiêu và độ hài lòng")
         
-        # Chuẩn bị dữ liệu cho K-means theo mùa
-        if 'Date Purchase' in data_df.columns and 'Purchase Amount (USD)' in data_df.columns:
-            # Tạo cột Quarter từ Date Purchase
-            kmeans_data = data_df.copy()
-            kmeans_data['Date Purchase'] = pd.to_datetime(kmeans_data['Date Purchase'], format='%d-%m-%Y')
-            kmeans_data['Quarter'] = kmeans_data['Date Purchase'].dt.quarter
+        # Chuẩn bị dữ liệu cho K-means phân nhóm khách hàng
+        if 'Purchase Amount (USD)' in data_df.columns and 'Review Rating' in data_df.columns:
+            # Xử lý missing values
+            kmeans_data = data_df.dropna(subset=['Purchase Amount (USD)', 'Review Rating']).copy()
             
-            # Chọn features cho K-means
-            feature_cols = ['Purchase Amount (USD)', 'Quarter']
-            if 'Review Rating' in kmeans_data.columns:
-                # Xử lý missing values trong Review Rating
-                kmeans_data = kmeans_data.dropna(subset=['Review Rating'])
-                feature_cols.append('Review Rating')
-            
-            k = st.slider("Số cụm theo mùa (k)", 3, 6, 4)
-            max_iter = st.slider("Số vòng lặp tối đa", 100, 500, 300, step=50)
+            k = st.slider("Số nhóm khách hàng (k)", 2, 6, 4, help="Số nhóm khách hàng muốn phân chia")
 
             if st.button("Chạy K-means"):
-                # Lấy dữ liệu khách hàng theo quarter
-                customer_seasonal = kmeans_data.groupby('Customer Reference ID').agg({
-                    'Purchase Amount (USD)': 'mean',
-                    'Quarter': lambda x: x.mode().iloc[0] if not x.mode().empty else x.iloc[0],
-                    'Review Rating': 'mean' if 'Review Rating' in feature_cols else 'first'
-                }).reset_index()
+                # Chạy K-means với dữ liệu đã chuẩn bị
+                labels, inertia, cluster_info = run_kmeans(kmeans_data, k=k)
                 
-                # Loại bỏ cột Review Rating nếu không có dữ liệu
-                if 'Review Rating' in customer_seasonal.columns:
-                    customer_seasonal = customer_seasonal.dropna(subset=['Review Rating'])
-                
-                labels, inertia = run_kmeans(customer_seasonal, feature_cols, k=k, max_iter=max_iter)
-                st.success(f"Đã phân cụm: k={k}, inertia={inertia:.2f}")
+                st.success(f"✅ Đã phân nhóm {len(kmeans_data)} khách hàng thành {k} nhóm (Inertia: {inertia:.2f})")
+
+                # Biểu đồ elbow method
+                st.subheader("Số Nhóm Khách Hàng Tối Ưu (Theo phương pháp Elbow)")
+                fig_elbow = plot_elbow_method(kmeans_data, max_k=8, highlight_k=k)
+                st.pyplot(fig_elbow)
                 
                 # Hiển thị kết quả phân cụm
-                result = customer_seasonal.copy()
+                result = kmeans_data.copy()
                 result["cluster"] = labels
-                st.dataframe(result[["Customer Reference ID", *feature_cols, "cluster"]].head(20))
                 
-                # Thống kê theo cụm và mùa
-                st.subheader("Thống kê theo cụm mùa vụ")
-                cluster_stats = result.groupby("cluster")[feature_cols].mean().round(2)
-                st.dataframe(cluster_stats)
+                # Hiển thị thông tin chi tiết về các nhóm
+                st.subheader("Thông Tin Chi Tiết Các Nhóm Khách Hàng")
+                for cluster_id in sorted(cluster_info.keys()):
+                    info = cluster_info[cluster_id]
+                    with st.expander(f"Nhóm {cluster_id}: {info['type']}", expanded=True):
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.metric("Số lượng", f"{info['count']} khách hàng")
+                        with col2:
+                            st.metric("Chi tiêu TB", f"${info['avg_amount']}")
+                        with col3:
+                            st.metric("Đánh giá TB", f"{info['avg_rating']}/5.0")
+                        with col4:
+                            st.metric("Tỷ lệ", f"{info['percentage']}%")
                 
-                # Diễn giải kinh doanh
-                st.subheader("Diễn giải kinh doanh:")
-                for cluster_id in sorted(result['cluster'].unique()):
-                    cluster_data = result[result['cluster'] == cluster_id]
-                    avg_amount = cluster_data['Purchase Amount (USD)'].mean()
-                    main_quarter = cluster_data['Quarter'].mode().iloc[0]
-                    quarter_names = {1: 'Q1 (Winter)', 2: 'Q2 (Spring)', 3: 'Q3 (Summer)', 4: 'Q4 (Fall)'}
+
+                # Biểu đồ phân cụm
+                fig_clusters = plot_clusters(kmeans_data, labels, k)
+                st.pyplot(fig_clusters)
+
+
+
+                
+                # Biểu đồ thống kê
+                st.subheader("Thống Kê Chi Tiết")
+                fig_stats = plot_cluster_stats(kmeans_data, labels, cluster_info)
+                st.pyplot(fig_stats)
+                
+                # Khuyến nghị kinh doanh dạng bảng
+                st.subheader("Khuyến Nghị Chiến Lược Cho Từng Nhóm Khách Hàng")
+                
+                # Tạo DataFrame cho khuyến nghị
+                strategy_data = []
+                for cluster_id in sorted(cluster_info.keys()):
+                    info = cluster_info[cluster_id]
                     
-                    st.write(f"• **Cụm {cluster_id}**: {quarter_names.get(main_quarter, f'Q{main_quarter}')} - Chi tiêu TB: ${avg_amount:.0f}")
-                    st.write(f"  → *Chiến lược:* Tập trung marketing vào {quarter_names.get(main_quarter, f'Q{main_quarter}')}")
+                    if "VIP" in info['type']:
+                        xep_loai = "Ưu tiên cao nhất"
+                        chien_luoc = "Dịch vụ đặc biệt, sản phẩm cao cấp, chương trình VIP"
+                    elif "Trung thành" in info['type']:
+                        xep_loai = "Khách hàng trung thành"
+                        chien_luoc = "Giữ chân, tăng giá trị đơn hàng, chương trình khuyến mãi"
+                    elif "chưa hài lòng" in info['type']:
+                        xep_loai = "Cần cải thiện"
+                        chien_luoc = "Nâng cao chất lượng dịch vụ, khảo sát feedback, chương trình khuyến mãi"
+                    else:
+                        xep_loai = "Cần quan tâm"
+                        chien_luoc = "Tăng engagement, cải thiện trải nghiệm, giá cả hợp lý"
+                    
+                    strategy_data.append({
+                        'Nhóm': cluster_id,
+                        'Loại': info['type'],
+                        'Xếp loại': xep_loai,
+                        'Số lượng': f"{info['count']} khách hàng",
+                        'Chi tiêu TB': f"${info['avg_amount']}",
+                        'Đánh giá TB': f"{info['avg_rating']}/5.0",
+                        'Chiến lược đề xuất': chien_luoc
+                    })
                 
-                # Biểu đồ trực quan hóa
-                col1, col2 = st.columns(2)
+                strategy_df = pd.DataFrame(strategy_data)
+                st.dataframe(strategy_df, use_container_width=True)
                 
-                with col1:
-                    st.subheader("Biểu đồ phân cụm theo mùa")
-                    if len(feature_cols) >= 2:
-                        fig_clusters = plot_clusters(result, feature_cols[:2], labels, k)
-                        if fig_clusters:
-                            st.pyplot(fig_clusters)
-                
-                with col2:
-                    st.subheader("Elbow Method")
-                    fig_elbow = plot_elbow_method(customer_seasonal, feature_cols, max_k=8)
-                    st.pyplot(fig_elbow)
         else:
-            st.error("Dữ liệu không có cột 'Date Purchase' hoặc 'Purchase Amount (USD)'")
+            st.error("Dữ liệu không có cột 'Purchase Amount (USD)' hoặc 'Review Rating'")
 
     elif algo == "Naive Bayes":
         st.subheader("Dự đoán Rating theo Loại Sản phẩm - Naive Bayes")
@@ -198,7 +206,7 @@ def main():
             target = 'Rating_Category'
             
             # Hiển thị dữ liệu đầu vào
-            st.write("**📋 Dữ liệu đầu vào (Naive Bayes):**")
+            st.write("**Dữ liệu đầu vào (Naive Bayes):**")
             nb_input = nb_data[feature_cols + [target]].copy()
             st.dataframe(nb_input.head(20))
             
@@ -254,7 +262,7 @@ def main():
             target = 'Should_Restock'
             
             # Hiển thị dữ liệu đầu vào
-            st.write("**📋 Dữ liệu đầu vào (Decision Tree CART):**")
+            st.write("**Dữ liệu đầu vào (Decision Tree CART):**")
             cart_input = inventory_data[feature_cols + [target]].copy()
             st.dataframe(cart_input.head(20))
             
@@ -295,7 +303,7 @@ def main():
             target = 'Has_Quality_Issue'
             
             # Hiển thị dữ liệu đầu vào
-            st.write("**📋 Dữ liệu đầu vào (Decision Tree ID3):**")
+            st.write("**Dữ liệu đầu vào (Decision Tree ID3):**")
             id3_input = quality_data[feature_cols + [target]].copy()
             st.dataframe(id3_input.head(20))
             
@@ -339,7 +347,7 @@ def main():
             target = 'Quarter'
             
             # Hiển thị dữ liệu đầu vào
-            st.write("**📋 Dữ liệu đầu vào (Decision Tree Quinlan):**")
+            st.write("**Dữ liệu đầu vào (Decision Tree Quinlan):**")
             quinlan_input = seasonal_data[feature_cols + [target]].copy()
             st.dataframe(quinlan_input.head(20))
             
@@ -376,7 +384,7 @@ def main():
             # Tạo transactions theo customer - mỗi customer có nhiều items
             transactions_df = data_df[['Customer Reference ID', 'Item Purchased']].copy()
             
-            st.write("**📋 Dữ liệu đầu vào:**")
+            st.write("**Dữ liệu đầu vào:**")
             st.dataframe(transactions_df)
         else:
             st.error("Dữ liệu không có cột 'Customer Reference ID' hoặc 'Item Purchased'")
@@ -395,7 +403,7 @@ def main():
                 transactions_list = [items for items in transactions_list if items]  # Loại bỏ empty
                 
                 # Tạo One-Hot Matrix để hiển thị
-                st.write("**🔢 Ma trận biểu diễn tập giao dịch:**")
+                st.write("**Ma trận biểu diễn tập giao dịch:**")
                 try:
                     from mlxtend.preprocessing import TransactionEncoder
                     
@@ -420,19 +428,19 @@ def main():
                 frequent, rules = run_apriori(transactions_df, min_support=min_sup, min_confidence=min_conf, top_k=top_k)
                 
                 # Hiển thị kết quả
-                st.write("**🎯 Tập phổ biến thỏa min-support:**")
+                st.write("**Tập phổ biến thỏa min-support:**", min_sup)
                 if not frequent.empty:
                     st.dataframe(frequent.head(20))
                     st.write(f"Tìm thấy {len(frequent)} tập phổ biến")
                 else:
                     st.warning("Không tìm thấy itemsets phổ biến. Hãy giảm min_support.")
                 
-                st.write("**🔗 Luật liên kết sản phẩm:**")
+                st.write("**Luật liên kết sản phẩm:**")
                 if not rules.empty:
                     st.dataframe(rules)
                     
                     # Phân tích kết quả
-                    st.write("**💡 Phân Tích Kết Quả:**")
+                    st.write("**Phân Tích Kết Quả:**")
                     for i, row in rules.iterrows():
                         st.write(f"• Nếu khách mua **{row['antecedents']}** → {row['confidence']:.1%} khả năng mua **{row['consequents']}** (lift={row['lift']:.1f})")
                         st.write(f"  → *Gợi ý:* Bố trí 2 sản phẩm này gần nhau trên kệ")
@@ -475,19 +483,19 @@ def main():
                 display_cols.append('Purchase Amount (USD)')
             display_cols.extend(['Review Rating', 'High_Rating'])
             
-            st.write("**📋 Dữ liệu đầu vào (Rough Set):**")
+            st.write("**Dữ liệu đầu vào:**")
             st.dataframe(analysis_data[display_cols].head(20))
             
             if st.button("Chạy Rough Set"):
                 # Phân tích các yếu tố
                 insights = analyze_review_factors(data_df)
                 
-                st.subheader("🎯 Các Yếu Tố Cốt Lõi Ảnh Hưởng Đánh Giá:")
+                st.subheader("Các Yếu Tố Cốt Lõi Ảnh Hưởng Đánh Giá:")
                 for i, factor in enumerate(insights['important_factors'], 1):
                     st.write(f"**{i}. {factor}**")
                 
                 # Thống kê tổng quan
-                st.subheader("📊 Thống Kê Tổng Quan:")
+                st.subheader("Thống Kê Tổng Quan:")
                 summary = insights['summary']
                 col1, col2, col3 = st.columns(3)
                 with col1:
@@ -498,7 +506,7 @@ def main():
                     st.metric("Đánh giá trung bình", f"{summary['avg_rating']}/5.0")
                 
                 # Phân tích chi tiết từng yếu tố
-                st.subheader("🔍 Phân Tích Chi Tiết Các Yếu Tố:")
+                st.subheader("Phân Tích Chi Tiết Các Yếu Tố:")
                 for i, factor in enumerate(insights['important_factors'], 1):
                     st.write(f"**{i}. {factor}**")
                     
@@ -506,8 +514,8 @@ def main():
                     
                     if factor_info['type'] == 'categorical':
                         # Yếu tố categorical
-                        st.write(f"🏆 **Loại tốt nhất:** {factor_info['best_category']} ({factor_info['best_rate']:.1%} đánh giá tốt)")
-                        st.write("📊 **Chi tiết theo từng loại:**")
+                        st.write(f"**Loại tốt nhất:** {factor_info['best_category']} ({factor_info['best_rate']:.1%} đánh giá tốt)")
+                        st.write("**Chi tiết theo từng loại:**")
                         
                         details = factor_info['details']
                         if details:  # Kiểm tra nếu có dữ liệu
@@ -523,7 +531,7 @@ def main():
                             
                     else:
                         # Yếu tố numerical
-                        st.write("📊 **So sánh giá trị trung bình:**")
+                        st.write("**So sánh giá trị trung bình:**")
                         st.write(f"• Đánh giá tốt (≥4.0): **{factor_info['high_rating_avg']}**")
                         st.write(f"• Đánh giá thấp (<4.0): **{factor_info['low_rating_avg']}**")
                         st.write(f"• Chênh lệch: **{factor_info['difference']}** ({factor_info['impact']})")
@@ -531,7 +539,7 @@ def main():
                     st.write("---")
                 
                 # Khuyến nghị cụ thể
-                st.subheader("💡 Khuyến Nghị Cụ Thể:")
+                st.subheader("Khuyến Nghị Cụ Thể:")
                 for recommendation in insights['recommendations']:
                     st.write(f"• {recommendation}")
         else:
