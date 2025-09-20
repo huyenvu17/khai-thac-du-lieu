@@ -16,7 +16,8 @@ st.set_page_config(page_title="Ứng Dụng Khai Thác Dữ Liệu Trong Lĩnh V
 @st.cache_data
 def load_fashion_retail_data() -> pd.DataFrame:
     try:
-        return load_csv("data/datasets/Fashion_Retail_Sales_one.csv")
+        # Sử dụng dữ liệu thống nhất
+        return load_csv("data/datasets/Fashion_Retail_Sales.csv")
     except Exception:
         return pd.DataFrame()
 
@@ -183,57 +184,90 @@ def main():
             st.error("Dữ liệu không có cột 'Purchase Amount (USD)' hoặc 'Review Rating'")
 
     elif algo == "Naive Bayes":
-        st.subheader("Dự đoán Rating theo Loại Sản phẩm - Naive Bayes")
-        st.write("**Mục tiêu:** Dự đoán rating dựa trên loại sản phẩm và thông tin khách hàng")
+        st.subheader("Dự Đoán Khả Năng Mua Lại Của Khách Hàng - Naive Bayes")
+        st.write("**Mục tiêu:** Xây dựng mô hình dự đoán khách hàng có khả năng quay lại mua hàng hay không")
         
         if 'Review Rating' in data_df.columns and 'Item Purchased' in data_df.columns:
             # Chuẩn bị dữ liệu cho Naive Bayes
             nb_data = data_df.copy()
-            # Loại bỏ missing values trong Review Rating
-            nb_data = nb_data.dropna(subset=['Review Rating'])
-            
-            feature_cols = ['Item Purchased']
-            if 'Purchase Amount (USD)' in nb_data.columns:
-                feature_cols.append('Purchase Amount (USD)')
-            if 'Payment Method' in nb_data.columns:
-                feature_cols.append('Payment Method')
-            
-            # Chuyển Review Rating thành categorical target (1-5 thành categories)
-            nb_data['Rating_Category'] = pd.cut(nb_data['Review Rating'], 
-                                               bins=[0, 2, 3, 4, 5], 
-                                               labels=['Poor', 'Fair', 'Good', 'Excellent'])
-            
-            target = 'Rating_Category'
+            # Loại bỏ missing values
+            nb_data = nb_data.dropna(subset=['Review Rating', 'Purchase Amount (USD)'])
             
             # Hiển thị dữ liệu đầu vào
-            st.write("**Dữ liệu đầu vào (Naive Bayes):**")
-            nb_input = nb_data[feature_cols + [target]].copy()
-            st.dataframe(nb_input.head(20))
-            
-            test_size = st.slider("Tỉ lệ test", 0.1, 0.5, 0.2)
+            st.write("**Dữ liệu đầu vào:**")
+            if 'Will_Return' in nb_data.columns:
+                # Sử dụng cột có sẵn
+                nb_input = nb_data[['Review Rating', 'Purchase Amount (USD)', 'Item Purchased', 'Payment Method', 'Will_Return']].copy()
+                st.dataframe(nb_input)
+            else:
+                # Tạo target mới (fallback)
+                avg_amount = nb_data['Purchase Amount (USD)'].mean()
+                nb_data['Will_Return'] = (
+                    (nb_data['Review Rating'] >= 4.0) & 
+                    (nb_data['Purchase Amount (USD)'] >= avg_amount * 0.8)
+                ).astype(int)
+                
+                nb_input = nb_data[['Review Rating', 'Purchase Amount (USD)', 'Item Purchased', 'Payment Method', 'Will_Return']].copy()
+                st.dataframe(nb_input.head(20))
+                
+                # Hiển thị thông tin về target
+                will_return_count = nb_data['Will_Return'].sum()
+                total_count = len(nb_data)
+                st.info(f"**Ngưỡng dự đoán:** Rating ≥ 4.0 và chi tiêu ≥ ${avg_amount*0.8:.0f} ({will_return_count}/{total_count} khách hàng)")
             
             if st.button("Chạy Naive Bayes"):
-                metrics, y_pred = run_nb(nb_data, target=target, feature_columns=feature_cols, test_size=test_size)
+                metrics, y_pred = run_nb(nb_data, test_size=0.2)
                 
-                st.subheader("Kết quả dự đoán Rating:")
-                st.write(f"**Accuracy:** {metrics['accuracy']:.2%}")
-                st.write(f"**Precision:** {metrics['precision']:.2%}")
-                st.write(f"**Recall:** {metrics['recall']:.2%}")
-                st.write(f"**F1-score:** {metrics['f1_score']:.2%}")
+                st.success(f"✅ Hoàn thành dự đoán")
                 
-                # Ma trận nhầm lẫn
-                if 'confusion_matrix' in metrics:
-                    st.subheader("Ma trận nhầm lẫn")
-                    cm_df = pd.DataFrame(metrics['confusion_matrix'], 
-                                       index=[f'Thực tế {i}' for i in range(len(metrics['confusion_matrix']))],
-                                       columns=[f'Dự đoán {i}' for i in range(len(metrics['confusion_matrix'][0]))])
-                    st.dataframe(cm_df)
+                # Hiển thị kết quả dự đoán đơn giản
+                st.subheader("Kết Quả Dự Đoán")
                 
-                # Diễn giải kinh doanh
-                st.subheader("Diễn giải kinh doanh:")
-                st.write("• **Mục đích:** Dự đoán rating để cải thiện chất lượng sản phẩm")
-                st.write("• **Ứng dụng:** Tập trung vào sản phẩm có rating thấp để cải thiện")
-                st.write("• **Chiến lược:** Ưu tiên phát triển sản phẩm trong category có rating cao")
+                prob_table = metrics['probability_table']
+                
+                # Hiển thị xác suất tổng quan
+                col1, col2 = st.columns(2)
+                with col1:
+                    will_return_prob = prob_table['prior_probabilities'].get(1, 0)
+                    st.metric("Khách hàng sẽ mua lại", f"{will_return_prob:.1%}")
+                
+                with col2:
+                    no_return_prob = prob_table['prior_probabilities'].get(0, 0)
+                    st.metric("Khách hàng không mua lại", f"{no_return_prob:.1%}")
+                
+                # Phân tích chi tiết theo nhóm
+                st.subheader("Phân Tích Chi Tiết Theo Nhóm")
+                
+                from src.naive_bayes import create_customer_insights, generate_business_recommendations
+                insights = create_customer_insights(nb_data, prob_table)
+                
+                # Phân tích theo sản phẩm
+                st.write("**Phân tích theo sản phẩm:**")
+                product_df = insights['product_analysis'].reset_index()
+                product_df.columns = ['Sản phẩm', 'Tổng số', 'Sẽ mua lại', 'Tỷ lệ mua lại']
+                product_df['Tỷ lệ mua lại'] = product_df['Tỷ lệ mua lại'].apply(lambda x: f"{x:.1%}")
+                st.dataframe(product_df, use_container_width=True)
+                
+                # Phân tích theo phương thức thanh toán
+                st.write("**Phân tích theo phương thức thanh toán:**")
+                payment_df = insights['payment_analysis'].reset_index()
+                payment_df.columns = ['Phương thức', 'Tổng số', 'Sẽ mua lại', 'Tỷ lệ mua lại']
+                payment_df['Tỷ lệ mua lại'] = payment_df['Tỷ lệ mua lại'].apply(lambda x: f"{x:.1%}")
+                st.dataframe(payment_df, use_container_width=True)
+                
+                # Phân tích theo mức chi tiêu
+                st.write("**Phân tích theo mức chi tiêu:**")
+                spending_df = insights['spending_analysis'].reset_index()
+                spending_df.columns = ['Mức chi tiêu', 'Tổng số', 'Sẽ mua lại', 'Tỷ lệ mua lại']
+                spending_df['Tỷ lệ mua lại'] = spending_df['Tỷ lệ mua lại'].apply(lambda x: f"{x:.1%}")
+                st.dataframe(spending_df, use_container_width=True)
+                
+                # Khuyến nghị kinh doanh
+                st.subheader("Tổng Kết Đề Xuất")
+                recommendations = generate_business_recommendations(insights)
+                
+                for rec in recommendations:
+                    st.write(rec)
         else:
             st.error("Dữ liệu không có cột 'Review Rating' hoặc 'Item Purchased'")
 

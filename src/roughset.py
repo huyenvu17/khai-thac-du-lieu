@@ -177,21 +177,21 @@ def _generate_recommendations(factor_analysis: dict) -> List[str]:
             best_rate = analysis['best_rate']
             
             if factor == 'Item Purchased':
-                recommendations.append(f"🎯 **Tập trung vào sản phẩm '{best_cat}'** - có tỷ lệ đánh giá tốt cao nhất ({best_rate:.1%})")
+                recommendations.append(f"Tập trung vào sản phẩm '{best_cat}' - có tỷ lệ đánh giá tốt cao nhất ({best_rate:.1%})")
             elif factor == 'Payment Method':
-                recommendations.append(f"💳 **Ưu tiên phương thức thanh toán '{best_cat}'** - khách hàng hài lòng nhất ({best_rate:.1%})")
+                recommendations.append(f"Ưu tiên phương thức thanh toán '{best_cat}' - khách hàng hài lòng nhất ({best_rate:.1%})")
                 
         elif analysis['type'] == 'numerical':
             if analysis['impact'] == 'positive':
-                recommendations.append(f"💰 **Tăng giá trị giao dịch** - khách hàng mua nhiều hơn có xu hướng đánh giá tốt hơn (+{analysis['difference']:.2f})")
+                recommendations.append(f"Tăng giá trị giao dịch - khách hàng mua nhiều hơn có xu hướng đánh giá tốt hơn (+{analysis['difference']:.2f})")
             else:
-                recommendations.append(f"📉 **Kiểm tra giá trị giao dịch** - cần tối ưu để cải thiện đánh giá")
+                recommendations.append(f"Kiểm tra giá trị giao dịch - cần tối ưu để cải thiện đánh giá")
     
     # Khuyến nghị tổng quát
     recommendations.extend([
-        "📊 **Theo dõi thường xuyên** các yếu tố quan trọng để duy trì chất lượng",
-        "🎯 **Tập trung marketing** vào các yếu tố có tác động mạnh nhất",
-        "📈 **Đo lường hiệu quả** sau khi áp dụng các khuyến nghị"
+        "Theo dõi thường xuyên các yếu tố quan trọng để duy trì chất lượng",
+        "Tập trung marketing vào các yếu tố có tác động mạnh nhất",
+        "Đo lường hiệu quả sau khi áp dụng các khuyến nghị"
     ])
     
     return recommendations
