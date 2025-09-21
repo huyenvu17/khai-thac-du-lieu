@@ -76,25 +76,22 @@ def main():
 
     # Hiển thị dữ liệu đầu vào cho thuật toán được chọn
     if algo == "K-means":
+        st.subheader("Thuật toán phân cụm K-means")
+        st.write("**Bài toán:** Phân nhóm khách hàng theo mức chi tiêu và độ hài lòng")
+        st.write("**Mục tiêu:** Phân nhóm khách hàng dựa trên số tiền chi tiêu và mức độ hài lòng, giúp doanh nghiệp nhận diện các phân khúc khách hàng tiềm năng để tối ưu hóa chiến lược marketing và chăm sóc khách hàng.")
         # Chuẩn bị dữ liệu cho K-means phân nhóm khách hàng
         if 'Purchase Amount (USD)' in data_df.columns and 'Review Rating' in data_df.columns:
             # Xử lý missing values
             kmeans_data = data_df.dropna(subset=['Purchase Amount (USD)', 'Review Rating']).copy()
             
-            st.write("**Dữ liệu đầu vào (K-means):**")
+            st.write("**Dữ liệu đầu vào:**")
             kmeans_input = kmeans_data[['Customer Reference ID', 'Purchase Amount (USD)', 'Review Rating']].copy()
-            st.dataframe(kmeans_input.head(20))
+            st.dataframe(kmeans_input)
         else:
             st.error("Dữ liệu không có cột 'Purchase Amount (USD)' hoặc 'Review Rating'")
 
-
-
-
-
     # Phần chạy thuật toán K-means
     if algo == "K-means":
-        st.subheader("Phân Nhóm Khách Hàng - K-means")
-        st.write("**Mục tiêu:** Phân nhóm khách hàng theo mức chi tiêu và độ hài lòng")
         
         # Chuẩn bị dữ liệu cho K-means phân nhóm khách hàng
         if 'Purchase Amount (USD)' in data_df.columns and 'Review Rating' in data_df.columns:
@@ -184,8 +181,9 @@ def main():
             st.error("Dữ liệu không có cột 'Purchase Amount (USD)' hoặc 'Review Rating'")
 
     elif algo == "Naive Bayes":
-        st.subheader("Dự Đoán Khả Năng Mua Lại Của Khách Hàng - Naive Bayes")
-        st.write("**Mục tiêu:** Xây dựng mô hình dự đoán khách hàng có khả năng quay lại mua hàng hay không")
+        st.subheader("Thuật toán Naive Bayes")
+        st.write("**Bài toán:** Dự đoán khách hàng có khả năng quay lại mua hàng hay không")
+        st.write("**Mục tiêu:** Xây dựng mô hình dự đoán khách hàng có khả năng quay lại mua hàng hay không, giúp doanh nghiệp tối ưu hóa chiến lược marketing và chăm sóc khách hàng.")
         
         if 'Review Rating' in data_df.columns and 'Item Purchased' in data_df.columns:
             # Chuẩn bị dữ liệu cho Naive Bayes
@@ -272,145 +270,453 @@ def main():
             st.error("Dữ liệu không có cột 'Review Rating' hoặc 'Item Purchased'")
 
     elif algo == "Decision-Tree-CART":
-        st.subheader("Kế hoạch Inventory - Decision Tree CART")
-        st.write("**Mục tiêu:** Quyết định nhập hàng dựa trên lịch sử bán và mùa vụ")
+        st.subheader("Thuật toán cây quyết định - Decision Tree CART")
+        st.write("**Bài toán:** Quyết định sản phẩm nên nhập/nên dừng")
+        st.write("**Thuật toán CART:** Sử dụng Gini để xây dựng cây quyết định")
+        st.write("**Yếu tố ảnh hưởng:** Sales_Volume, Profit_Margin, Customer_Demand, Seasonality")
+        st.write("**Mục tiêu:** Restock (Yes/No) - dựa trên Sales cao, Rating tốt, Giá trị hợp lý")
         
-        if 'Purchase Amount (USD)' in data_df.columns and 'Item Purchased' in data_df.columns:
-            # Tạo target cho inventory decision
-            cart_data = data_df.copy()
-            if 'Date Purchase' in cart_data.columns:
-                cart_data['Date Purchase'] = pd.to_datetime(cart_data['Date Purchase'], format='%d-%m-%Y')
-                cart_data['Month'] = cart_data['Date Purchase'].dt.month
-            
-            # Tạo target: 1 nếu nên nhập hàng (doanh thu cao), 0 nếu không
-            inventory_data = cart_data.groupby('Item Purchased').agg({
-                'Purchase Amount (USD)': 'mean',
-                'Month': lambda x: x.mode().iloc[0] if not x.mode().empty else x.iloc[0]
-            }).reset_index()
-            
-            # Tạo binary target cho inventory decision
-            median_amount = inventory_data['Purchase Amount (USD)'].median()
-            inventory_data['Should_Restock'] = (inventory_data['Purchase Amount (USD)'] > median_amount).astype(int)
-            
-            feature_cols = ['Purchase Amount (USD)', 'Month']
-            target = 'Should_Restock'
-            
+        if 'Review Rating' in data_df.columns and 'Item Purchased' in data_df.columns and 'Purchase Amount (USD)' in data_df.columns:
             # Hiển thị dữ liệu đầu vào
-            st.write("**Dữ liệu đầu vào (Decision Tree CART):**")
-            cart_input = inventory_data[feature_cols + [target]].copy()
-            st.dataframe(cart_input.head(20))
-            
-            max_depth = st.slider("Max depth", 1, 10, 5)
-            min_split = st.slider("Min samples split", 2, 10, 2)
+            st.write("**Dữ liệu đầu vào:**")
+            st.dataframe(data_df[['Item Purchased', 'Purchase Amount (USD)', 'Payment Method', 'Review Rating', 'Date Purchase']].head(20))
             
             if st.button("Chạy CART"):
-                metrics = run_dt_cart(inventory_data, target=target, feature_columns=feature_cols, max_depth=max_depth, min_samples_split=min_split)
+                metrics = run_dt_cart(data_df)
                 
-                st.subheader("Kết quả quyết định nhập hàng:")
-                st.write(f"**Accuracy:** {metrics['accuracy']:.2%}")
+                st.success("✅ Hoàn thành phân tích Decision Tree CART")
                 
-                # Diễn giải kinh doanh
-                st.subheader("Diễn giải kinh doanh:")
-                st.write("• **Mục đích:** Quyết định nhập hàng dựa trên lịch sử bán")
-                st.write("• **Ứng dụng:** Tối ưu hóa inventory, tránh tồn kho")
-                st.write("• **Chiến lược:** Tập trung nhập hàng vào category có doanh thu cao")
+                # Hiển thị thống kê tổng quan
+                data_summary = metrics['data_summary']
+                st.subheader("1. Thống Kê Tổng Quan")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Tổng mẫu", data_summary['total_samples'])
+                with col2:
+                    st.metric("Nên nhập", f"{data_summary['should_restock_count']} ({data_summary['should_restock_count']/data_summary['total_samples']:.1%})")
+                with col3:
+                    st.metric("Nên dừng", f"{data_summary['should_stop_count']} ({data_summary['should_stop_count']/data_summary['total_samples']:.1%})")
+                with col4:
+                    st.metric("Accuracy", f"{metrics['accuracy']:.1%}")
+                
+                # Hiển thị bảng Gini Impurity và Information Gain
+                gini_info = metrics['gini_info']
+                st.subheader("2. Bảng Gini Impurity và Information Gain")
+                gain_data = []
+                for feature, gain_info in gini_info['feature_gains'].items():
+                    gain_data.append({
+                        'Thuộc tính': feature,
+                        'Information Gain': f"{gain_info['information_gain']:.3f}",
+                        'Weighted Gini': f"{gain_info['weighted_gini']:.3f}"
+                    })
+                
+                gain_df = pd.DataFrame(gain_data)
+                st.dataframe(gain_df, use_container_width=True)
+                
+                # Hiển thị chi tiết Gini
+                st.subheader("3. Chi Tiết Gini Impurity Theo Thuộc Tính")
+                
+                for feature, gain_info in gini_info['feature_gains'].items():
+                    with st.expander(f"📊 {feature} (Gain: {gain_info['information_gain']:.3f})"):
+                        st.write("**Phân bố thuộc tính:**")
+                        feature_dist = gain_info['feature_distribution']
+                        for value, count in feature_dist.items():
+                            st.write(f"• {value}: {count} mẫu")
+                        
+                        st.write("**Chi tiết Gini Impurity:**")
+                        gini_details = gain_info['gini_details']
+                        for value, details in gini_details.items():
+                            st.write(f"**{value}:**")
+                            st.write(f"  - Số mẫu: {details['count']}")
+                            st.write(f"  - Gini: {details['gini']:.3f}")
+                            st.write(f"  - Phân bố: {details['target_distribution']}")
+                
+                # Hiển thị sơ đồ cây quyết định trực quan
+                st.subheader("4. Sơ Đồ Cây Quyết Định")
+                
+                tree_figure = metrics.get('decision_tree_figure')
+                if tree_figure is not None:
+                    st.write("**Sơ đồ cây quyết định trực quan:**")
+                    st.pyplot(tree_figure)
+                else:
+                    st.write("**Sơ đồ trực quan không khả dụng, hiển thị dạng text:**")
+                    tree_rules = metrics['decision_tree_rules']
+                    st.text_area("Cây quyết định CART:", tree_rules, height=200)
+                
+                # Phân tích kết quả
+                st.subheader("5. Phân Tích Kết Quả")
+                restock_analysis = metrics['restock_analysis']
+                
+                # Phân tích theo Sales_Volume
+                st.write("**Phân tích theo khối lượng bán:**")
+                sales_data = []
+                for sales_volume, stats in restock_analysis['Sales_Volume'].items():
+                    sales_data.append({
+                        'Khối lượng bán': sales_volume,
+                        'Số mẫu': stats['count'],
+                        'Nên nhập': stats['should_restock'],
+                        'Tỷ lệ nên nhập': f"{stats['restock_rate']}%"
+                    })
+                
+                sales_df = pd.DataFrame(sales_data)
+                st.dataframe(sales_df, use_container_width=True)
+                
+                # Phân tích theo Profit_Margin
+                st.write("**Phân tích theo tỷ suất lợi nhuận:**")
+                profit_data = []
+                for profit_margin, stats in restock_analysis['Profit_Margin'].items():
+                    profit_data.append({
+                        'Tỷ suất lợi nhuận': profit_margin,
+                        'Số mẫu': stats['count'],
+                        'Nên nhập': stats['should_restock'],
+                        'Tỷ lệ nên nhập': f"{stats['restock_rate']}%"
+                    })
+                
+                profit_df = pd.DataFrame(profit_data)
+                st.dataframe(profit_df, use_container_width=True)
+                
+                # Phân tích theo Customer_Demand
+                st.write("**Phân tích theo mức độ quan tâm khách hàng:**")
+                demand_data = []
+                for customer_demand, stats in restock_analysis['Customer_Demand'].items():
+                    demand_data.append({
+                        'Mức độ quan tâm': customer_demand,
+                        'Số mẫu': stats['count'],
+                        'Nên nhập': stats['should_restock'],
+                        'Tỷ lệ nên nhập': f"{stats['restock_rate']}%"
+                    })
+                
+                demand_df = pd.DataFrame(demand_data)
+                st.dataframe(demand_df, use_container_width=True)
+                
+                # Phân tích theo Seasonality
+                st.write("**Phân tích theo tính mùa vụ:**")
+                season_data = []
+                for seasonality, stats in restock_analysis['Seasonality'].items():
+                    season_data.append({
+                        'Mùa vụ': seasonality,
+                        'Số mẫu': stats['count'],
+                        'Nên nhập': stats['should_restock'],
+                        'Tỷ lệ nên nhập': f"{stats['restock_rate']}%"
+                    })
+                
+                season_df = pd.DataFrame(season_data)
+                st.dataframe(season_df, use_container_width=True)
+                
+                # Kết luận
+                st.subheader("6. Kết Luận")
+                best_feature = list(gini_info['feature_gains'].keys())[0]
+                best_gain = gini_info['feature_gains'][best_feature]['information_gain']
+                
+                st.write(f"**Thuộc tính quan trọng nhất**: {best_feature} (Gain: {best_gain:.3f})")
+                overview = restock_analysis['overview']
+                if overview['restock_rate'] > 50:
+                    st.write("Tỷ lệ sản phẩm nên nhập cao - tập trung mở rộng inventory")
+                else:
+                    st.write("Tỷ lệ sản phẩm nên nhập thấp - cần cải thiện chất lượng sản phẩm")
+                
         else:
-            st.error("Dữ liệu không có cột 'Purchase Amount (USD)' hoặc 'Item Purchased'")
+            st.error("Dữ liệu không có đủ cột cần thiết: 'Review Rating', 'Item Purchased', 'Purchase Amount (USD)'")
 
     elif algo == "Decision-Tree-ID3":
-        st.subheader("Quality Control - Decision Tree ID3")
-        st.write("**Mục tiêu:** Phân loại sản phẩm có vấn đề dựa trên rating và feedback")
+        st.subheader("Thuật toán cây quyết định - Decision Tree ID3")
+        st.write("**Bài toán:** Dự đoán khách hàng có mua hàng hay không")
+        st.write("**Mục tiêu:** Dự đoán khách hàng có mua hàng hay không, giúp doanh nghiệp tối ưu hóa chiến lược marketing và chăm sóc khách hàng.")
+        st.write("**Yếu tố ảnh hưởng:** Item_Type, Price_Range, Payment_Preference, Customer_Type")
+        st.write("**Mục tiêu:** Will_Buy (Yes/No) - dựa trên Review Rating ≥ 3.5 và giá trị ≥ $100")
         
-        if 'Review Rating' in data_df.columns and 'Item Purchased' in data_df.columns:
-            # Tạo target cho quality control: 1 nếu có vấn đề (rating thấp), 0 nếu không
-            quality_data = data_df.copy()
-            # Loại bỏ missing values trong Review Rating
-            quality_data = quality_data.dropna(subset=['Review Rating'])
-            
-            # Tạo binary target: 1 nếu rating <= 3 (có vấn đề), 0 nếu rating > 3 (tốt)
-            quality_data['Has_Quality_Issue'] = (quality_data['Review Rating'] <= 3).astype(int)
-            
-            feature_cols = ['Item Purchased', 'Purchase Amount (USD)']
-            if 'Payment Method' in quality_data.columns:
-                feature_cols.append('Payment Method')
-            
-            target = 'Has_Quality_Issue'
-            
+        if 'Review Rating' in data_df.columns and 'Item Purchased' in data_df.columns and 'Purchase Amount (USD)' in data_df.columns:
             # Hiển thị dữ liệu đầu vào
-            st.write("**Dữ liệu đầu vào (Decision Tree ID3):**")
-            id3_input = quality_data[feature_cols + [target]].copy()
-            st.dataframe(id3_input.head(20))
-            
-            max_depth = st.slider("Max depth", 1, 10, 5)
-            min_split = st.slider("Min samples split", 2, 10, 2)
+            st.write("**Dữ liệu đầu vào:**")
+            st.dataframe(data_df[['Item Purchased', 'Purchase Amount (USD)', 'Payment Method', 'Review Rating', 'Will_Return']].head(20))
             
             if st.button("Chạy ID3"):
-                metrics = run_dt_id3(quality_data, target=target, feature_columns=feature_cols, max_depth=max_depth, min_samples_split=min_split)
+                metrics = run_dt_id3(data_df)
                 
-                st.subheader("Kết quả kiểm soát chất lượng:")
-                st.write(f"**Accuracy:** {metrics['accuracy']:.2%}")
-                st.write(f"**Precision:** {metrics['precision']:.2%}")
-                st.write(f"**Recall:** {metrics['recall']:.2%}")
+                st.success("✅ Hoàn thành phân tích Decision Tree ID3")
                 
-                # Diễn giải kinh doanh
-                st.subheader("Diễn giải kinh doanh:")
-                st.write("• **Mục đích:** Phát hiện sản phẩm có vấn đề chất lượng")
-                st.write("• **Ứng dụng:** Kiểm soát chất lượng, cải thiện sản phẩm")
-                st.write("• **Chiến lược:** Tập trung vào sản phẩm có rating thấp để cải thiện")
+                # Hiển thị thống kê tổng quan
+                data_summary = metrics['data_summary']
+                st.subheader("1. Thống Kê Tổng Quan")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Tổng mẫu", data_summary['total_samples'])
+                with col2:
+                    st.metric("Sẽ mua", f"{data_summary['will_buy_count']} ({data_summary['will_buy_count']/data_summary['total_samples']:.1%})")
+                with col3:
+                    st.metric("Không mua", f"{data_summary['will_not_buy_count']} ({data_summary['will_not_buy_count']/data_summary['total_samples']:.1%})")
+                with col4:
+                    st.metric("Accuracy", f"{metrics['accuracy']:.1%}")
+                
+                # Hiển thị bảng Information Gain
+                entropy_info = metrics['entropy_info']
+                st.subheader("2. Bảng Information Gain")
+                gain_data = []
+                for feature, gain_info in entropy_info['feature_gains'].items():
+                    gain_data.append({
+                        'Thuộc tính': feature,
+                        'Information Gain': f"{gain_info['information_gain']:.3f}",
+                        'Weighted Entropy': f"{gain_info['weighted_entropy']:.3f}"
+                    })
+                
+                gain_df = pd.DataFrame(gain_data)
+                st.dataframe(gain_df, use_container_width=True)
+                
+                # Hiển thị chi tiết Entropy
+                st.subheader("3. Chi Tiết Entropy Theo Thuộc Tính")
+                
+                for feature, gain_info in entropy_info['feature_gains'].items():
+                    with st.expander(f"📊 {feature} (Gain: {gain_info['information_gain']:.3f})"):
+                        st.write("**Phân bố thuộc tính:**")
+                        feature_dist = gain_info['feature_distribution']
+                        for value, count in feature_dist.items():
+                            st.write(f"• {value}: {count} mẫu")
+                        
+                        st.write("**Chi tiết Entropy:**")
+                        entropy_details = gain_info['entropy_details']
+                        for value, details in entropy_details.items():
+                            st.write(f"**{value}:**")
+                            st.write(f"  - Số mẫu: {details['count']}")
+                            st.write(f"  - Entropy: {details['entropy']:.3f}")
+                            st.write(f"  - Phân bố: {details['target_distribution']}")
+                
+                # Hiển thị sơ đồ cây quyết định trực quan
+                st.subheader("4. Sơ Đồ Cây Quyết Định")
+                
+                tree_figure = metrics.get('decision_tree_figure')
+                if tree_figure is not None:
+                    st.write("**Sơ đồ cây quyết định trực quan:**")
+                    st.pyplot(tree_figure)
+                else:
+                    st.write("**Sơ đồ trực quan không khả dụng, hiển thị dạng text:**")
+                    tree_rules = metrics['decision_tree_rules']
+                    st.text_area("Cây quyết định ID3:", tree_rules, height=200)
+                
+                # Phân tích kết quả
+                st.subheader("5. Phân Tích Kết Quả")
+                purchase_analysis = metrics['purchase_analysis']
+                
+                # Phân tích theo Item_Type
+                st.write("**Phân tích theo loại sản phẩm:**")
+                item_type_data = []
+                for item_type, stats in purchase_analysis['Item_Type'].items():
+                    item_type_data.append({
+                        'Loại sản phẩm': item_type,
+                        'Số mẫu': stats['count'],
+                        'Sẽ mua': stats['will_buy'],
+                        'Tỷ lệ mua': f"{stats['buy_rate']}%"
+                    })
+                
+                item_type_df = pd.DataFrame(item_type_data)
+                st.dataframe(item_type_df, use_container_width=True)
+                
+                # Phân tích theo Price_Range
+                st.write("**Phân tích theo mức giá:**")
+                price_data = []
+                for price_range, stats in purchase_analysis['Price_Range'].items():
+                    price_data.append({
+                        'Mức giá': price_range,
+                        'Số mẫu': stats['count'],
+                        'Sẽ mua': stats['will_buy'],
+                        'Tỷ lệ mua': f"{stats['buy_rate']}%"
+                    })
+                
+                price_df = pd.DataFrame(price_data)
+                st.dataframe(price_df, use_container_width=True)
+                
+                # Phân tích theo Customer_Type
+                st.write("**Phân tích theo loại khách hàng:**")
+                customer_data = []
+                for customer_type, stats in purchase_analysis['Customer_Type'].items():
+                    customer_data.append({
+                        'Loại khách hàng': customer_type,
+                        'Số mẫu': stats['count'],
+                        'Sẽ mua': stats['will_buy'],
+                        'Tỷ lệ mua': f"{stats['buy_rate']}%"
+                    })
+                
+                customer_df = pd.DataFrame(customer_data)
+                st.dataframe(customer_df, use_container_width=True)
+                
+                # Kết luận
+                st.subheader("6. Kết Luận")
+                best_feature = list(entropy_info['feature_gains'].keys())[0]
+                best_gain = entropy_info['feature_gains'][best_feature]['information_gain']
+                
+                st.write(f"**Thuộc tính quan trọng nhất**: {best_feature} (Gain: {best_gain:.3f})")
+                st.write("**Mục đích**: Dự đoán khả năng mua hàng của khách hàng")
+                st.write("**Ứng dụng**: Tối ưu hóa marketing, cá nhân hóa trải nghiệm khách hàng")
+                
+                # Khuyến nghị
+                st.write("**Khuyến nghị:**")
+                overview = purchase_analysis['overview']
+                if overview['buy_rate'] > 50:
+                    st.write("• Tỷ lệ mua hàng cao - tập trung duy trì chất lượng dịch vụ")
+                else:
+                    st.write("• Tỷ lệ mua hàng thấp - cần cải thiện trải nghiệm khách hàng")
+                
+                st.write(f"• Tổng cộng {overview['total_samples']} mẫu, {overview['will_buy']} khách hàng có khả năng mua ({overview['buy_rate']}%)")
         else:
-            st.error("Dữ liệu không có cột 'Review Rating' hoặc 'Item Purchased'")
+            st.error("Dữ liệu không có đủ cột cần thiết: 'Review Rating', 'Item Purchased', 'Purchase Amount (USD)'")
 
     elif algo == "Decision-Tree-Quinlan":
-        st.subheader("Seasonal Planning - Decision Tree Quinlan (C4.5)")
-        st.write("**Mục tiêu:** Dự đoán sản phẩm phù hợp theo quý")
+        st.subheader("Thuật toán cây quyết định - Decision Tree Quinlan (C4.5)")
+        st.write("**Bài toán:** Dự đoán xu hướng mùa vụ")
+        st.write("**Mục tiêu:** Dự đoán xu hướng mùa vụ, giúp doanh nghiệp tối ưu hóa chiến lược sản phẩm và marketing mùa vụ.")
+        st.write("**Thuật toán C4.5:** Sử dụng Gain Ratio để xây dựng cây quyết định")
+        st.write("**Yếu tố ảnh hưởng:** Product_Category, Price_Level, Customer_Segment, Time_Period")
+        st.write("**Output:** Seasonal_Trend (High/Low) - dựa trên Rating tốt, Giá cao, Thời kỳ phù hợp")
         
-        if 'Date Purchase' in data_df.columns and 'Item Purchased' in data_df.columns:
-            # Chuẩn bị dữ liệu cho seasonal planning
-            seasonal_data = data_df.copy()
-            seasonal_data['Date Purchase'] = pd.to_datetime(seasonal_data['Date Purchase'], format='%d-%m-%Y')
-            seasonal_data['Quarter'] = seasonal_data['Date Purchase'].dt.quarter
-            
-            # Tạo target: Quarter (1-4)
-            feature_cols = ['Item Purchased', 'Purchase Amount (USD)']
-            if 'Review Rating' in seasonal_data.columns:
-                seasonal_data = seasonal_data.dropna(subset=['Review Rating'])
-                feature_cols.append('Review Rating')
-            if 'Payment Method' in seasonal_data.columns:
-                feature_cols.append('Payment Method')
-            
-            target = 'Quarter'
-            
+        if 'Review Rating' in data_df.columns and 'Item Purchased' in data_df.columns and 'Purchase Amount (USD)' in data_df.columns:
             # Hiển thị dữ liệu đầu vào
-            st.write("**Dữ liệu đầu vào (Decision Tree Quinlan):**")
-            quinlan_input = seasonal_data[feature_cols + [target]].copy()
-            st.dataframe(quinlan_input.head(20))
-            
-            max_depth = st.slider("Max depth", 1, 10, 5)
-            min_split = st.slider("Min samples split", 2, 10, 2)
+            st.write("**Dữ liệu đầu vào:**")
+            st.dataframe(data_df[['Item Purchased', 'Purchase Amount (USD)', 'Payment Method', 'Review Rating', 'Date Purchase', 'Will_Return']].head(20))
             
             if st.button("Chạy Quinlan"):
-                metrics = run_dt_quinlan(seasonal_data, target=target, feature_columns=feature_cols, max_depth=max_depth, min_samples_split=min_split)
+                metrics = run_dt_quinlan(data_df)
                 
-                st.subheader("Kết quả dự đoán mùa vụ:")
-                st.write(f"**Accuracy:** {metrics['accuracy']:.2%}")
+                st.success("✅ Hoàn thành phân tích Decision Tree Quinlan (C4.5)")
                 
-                # Diễn giải kinh doanh
-                st.subheader("Diễn giải kinh doanh:")
-                st.write("• **Mục đích:** Dự đoán sản phẩm phù hợp theo quý")
-                st.write("• **Ứng dụng:** Kế hoạch sản phẩm theo mùa, marketing mùa vụ")
-                st.write("• **Chiến lược:** Chuẩn bị inventory và marketing phù hợp với từng quý")
+                # Hiển thị thống kê tổng quan
+                data_summary = metrics['data_summary']
+                st.subheader("1. Thống Kê Tổng Quan")
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Tổng mẫu", data_summary['total_samples'])
+                with col2:
+                    st.metric("Xu hướng cao", f"{data_summary['high_trend_count']} ({data_summary['high_trend_count']/data_summary['total_samples']:.1%})")
+                with col3:
+                    st.metric("Xu hướng thấp", f"{data_summary['low_trend_count']} ({data_summary['low_trend_count']/data_summary['total_samples']:.1%})")
+                with col4:
+                    st.metric("Accuracy", f"{metrics['accuracy']:.1%}")
                 
-                # Hiển thị phân bố theo quý
-                quarter_dist = seasonal_data['Quarter'].value_counts().sort_index()
-                quarter_names = {1: 'Q1 (Winter)', 2: 'Q2 (Spring)', 3: 'Q3 (Summer)', 4: 'Q4 (Fall)'}
-                st.subheader("Phân bố giao dịch theo quý:")
-                for q, count in quarter_dist.items():
-                    st.write(f"• **{quarter_names.get(q, f'Q{q}')}**: {count} giao dịch")
+                # Hiển thị bảng Gain Ratio
+                gain_ratio_info = metrics['gain_ratio_info']
+                st.subheader("2. Bảng Entropy và Gain Ratio")
+                gain_data = []
+                for feature, gain_info in gain_ratio_info['feature_gains'].items():
+                    gain_data.append({
+                        'Thuộc tính': feature,
+                        'Information Gain': f"{gain_info['information_gain']:.3f}",
+                        'Split Information': f"{gain_info['split_information']:.3f}",
+                        'Gain Ratio': f"{gain_info['gain_ratio']:.3f}"
+                    })
+                
+                gain_df = pd.DataFrame(gain_data)
+                st.dataframe(gain_df, use_container_width=True)
+                
+                # Hiển thị chi tiết Gain Ratio
+                st.subheader("3. Chi Tiết Gain Ratio Theo Thuộc Tính")
+                
+                for feature, gain_info in gain_ratio_info['feature_gains'].items():
+                    with st.expander(f"📊 {feature} (Gain Ratio: {gain_info['gain_ratio']:.3f})"):
+                        st.write("**Phân bố thuộc tính:**")
+                        feature_dist = gain_info['feature_distribution']
+                        for value, count in feature_dist.items():
+                            st.write(f"• {value}: {count} mẫu")
+                        
+                        st.write("**Chi tiết Entropy:**")
+                        entropy_details = gain_info['entropy_details']
+                        for value, details in entropy_details.items():
+                            st.write(f"**{value}:**")
+                            st.write(f"  - Số mẫu: {details['count']}")
+                            st.write(f"  - Entropy: {details['entropy']:.3f}")
+                            st.write(f"  - Phân bố: {details['target_distribution']}")
+                
+                # Hiển thị sơ đồ cây quyết định trực quan
+                st.subheader("4. Sơ Đồ Cây Quyết Định")
+                
+                tree_figure = metrics.get('decision_tree_figure')
+                if tree_figure is not None:
+                    st.write("**Sơ đồ cây quyết định trực quan:**")
+                    st.pyplot(tree_figure)
+                else:
+                    st.write("**Sơ đồ trực quan không khả dụng, hiển thị dạng text:**")
+                    tree_rules = metrics['decision_tree_rules']
+                    st.text_area("Cây quyết định C4.5:", tree_rules, height=200)
+                
+                # Phân tích kết quả
+                st.subheader("5. Phân Tích Kết Quả")
+                seasonal_analysis = metrics['seasonal_analysis']
+                
+                # Phân tích theo Product_Category
+                st.write("**Phân tích theo danh mục sản phẩm:**")
+                product_data = []
+                for product_category, stats in seasonal_analysis['Product_Category'].items():
+                    product_data.append({
+                        'Danh mục sản phẩm': product_category,
+                        'Số mẫu': stats['count'],
+                        'Xu hướng cao': stats['high_trend'],
+                        'Tỷ lệ xu hướng cao': f"{stats['high_trend_rate']}%"
+                    })
+                
+                product_df = pd.DataFrame(product_data)
+                st.dataframe(product_df, use_container_width=True)
+                
+                # Phân tích theo Price_Level
+                st.write("**Phân tích theo mức giá:**")
+                price_data = []
+                for price_level, stats in seasonal_analysis['Price_Level'].items():
+                    price_data.append({
+                        'Mức giá': price_level,
+                        'Số mẫu': stats['count'],
+                        'Xu hướng cao': stats['high_trend'],
+                        'Tỷ lệ xu hướng cao': f"{stats['high_trend_rate']}%"
+                    })
+                
+                price_df = pd.DataFrame(price_data)
+                st.dataframe(price_df, use_container_width=True)
+                
+                # Phân tích theo Customer_Segment
+                st.write("**Phân tích theo phân khúc khách hàng:**")
+                segment_data = []
+                for customer_segment, stats in seasonal_analysis['Customer_Segment'].items():
+                    segment_data.append({
+                        'Phân khúc khách hàng': customer_segment,
+                        'Số mẫu': stats['count'],
+                        'Xu hướng cao': stats['high_trend'],
+                        'Tỷ lệ xu hướng cao': f"{stats['high_trend_rate']}%"
+                    })
+                
+                segment_df = pd.DataFrame(segment_data)
+                st.dataframe(segment_df, use_container_width=True)
+                
+                # Phân tích theo Time_Period
+                st.write("**Phân tích theo thời kỳ:**")
+                time_data = []
+                for time_period, stats in seasonal_analysis['Time_Period'].items():
+                    time_data.append({
+                        'Thời kỳ': time_period,
+                        'Số mẫu': stats['count'],
+                        'Xu hướng cao': stats['high_trend'],
+                        'Tỷ lệ xu hướng cao': f"{stats['high_trend_rate']}%"
+                    })
+                
+                time_df = pd.DataFrame(time_data)
+                st.dataframe(time_df, use_container_width=True)
+                
+                # Kết luận
+                st.subheader("6. Kết Luận")
+                best_feature = list(gain_ratio_info['feature_gains'].keys())[0]
+                best_gain_ratio = gain_ratio_info['feature_gains'][best_feature]['gain_ratio']
+                
+                st.write(f"**Thuộc tính quan trọng nhất**: {best_feature} (Gain Ratio: {best_gain_ratio:.3f})")
+                st.write("**Mục đích**: Dự đoán xu hướng mùa vụ của sản phẩm")
+                st.write("**Ứng dụng**: Kế hoạch sản phẩm theo mùa, marketing mùa vụ, tối ưu hóa inventory")
+                
+                # Khuyến nghị
+                overview = seasonal_analysis['overview']
+                if overview['high_trend_rate'] > 50:
+                    st.write("Tỷ lệ xu hướng mùa vụ cao - tập trung phát triển sản phẩm theo mùa")
+                else:
+                    st.write("Tỷ lệ xu hướng mùa vụ thấp - cần cải thiện chiến lược mùa vụ")
+                
         else:
-            st.error("Dữ liệu không có cột 'Date Purchase' hoặc 'Item Purchased'")
+            st.error("Dữ liệu không có đủ cột cần thiết: 'Review Rating', 'Item Purchased', 'Purchase Amount (USD)'")
 
     elif algo == "Apriori":
         st.subheader("Thuật Toán Apriori (Tập phổ biến và luật liên kết)")
+        st.write("**Bài toán:** Đưa ra các sản phẩm khác hàng thường được chọn kèm mỗi lần mua sắm, từ đó giúp đưa ra gợi ý bố trí sản phẩm hợp lý để tăng hiệu quả bán hàng.")
         st.write("**Mục tiêu:** Thuật toán Apriori được dùng trong bài toán để đưa ra các sản phẩm khác hàng thường được chọn kèm mỗi lần mua sắm, từ đó giúp đưa ra gợi ý bố trí sản phẩm hợp lý để tăng hiệu quả bán hàng.")
         
         # Hiển thị dữ liệu đầu vào cho Apriori
@@ -484,7 +790,8 @@ def main():
                 st.error("Dữ liệu không có cột 'Customer Reference ID' hoặc 'Item Purchased'")
 
     elif algo == "Rough Set":
-        st.subheader("Phân Tích Yếu Tố Ảnh Hưởng Đánh Giá - Rough Set")
+        st.subheader("Thuật toán tập thô (Rough Set)")
+        st.write("**Bài toán:** Phân Tích Yếu Tố Ảnh Hưởng Đánh Giá")
         st.write("**Mục tiêu:** Tìm những yếu tố cốt lõi ảnh hưởng đến việc khách hàng để lại đánh giá tốt (Review Rating cao)")
         
         if 'Review Rating' in data_df.columns:
@@ -572,8 +879,8 @@ def main():
                     
                     st.write("---")
                 
-                # Khuyến nghị cụ thể
-                st.subheader("Khuyến Nghị Cụ Thể:")
+                # Đề xuất
+                st.subheader("Đề xuất:")
                 for recommendation in insights['recommendations']:
                     st.write(f"• {recommendation}")
         else:

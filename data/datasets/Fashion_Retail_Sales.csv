@@ -1,64 +1,205 @@
-Customer Reference ID,Item Purchased,Purchase Amount (USD),Date Purchase,Review Rating,Payment Method,Will_Return
-4018,Handbag,4619.0,05-02-2023,3.6,Credit Card,0
-4115,Tunic,2456.0,11-07-2023,2.0,Credit Card,1
-4019,Tank Top,2102.0,23-03-2023,4.1,Cash,0
-4097,Leggings,3126.0,15-03-2023,3.2,Cash,1
-3997,Wallet,3003.0,27-11-2022,4.7,Cash,1
-4080,Onesie,2914.0,11-12-2022,4.5,Credit Card,1
-4055,Jacket,2571.0,08-07-2023,1.3,Cash,0
-3973,Trousers,2419.0,10-11-2022,4.6,Cash,1
-4044,Jeans,4771.0,19-05-2023,4.1,Cash,1
-4010,Loafers,4233.0,11-06-2023,3.0,Credit Card,0
-4108,Slippers,2356.0,19-03-2023,4.8,Credit Card,0
-4067,Bowtie,4418.0,21-11-2022,3.4,Cash,1
-4068,Pajamas,3728.0,09-12-2022,2.5,Credit Card,1
-4102,Trench Coat,2130.0,29-01-2023,4.8,Cash,0
-4044,Handbag,2122.0,01-08-2023,1.2,Credit Card,0
-4096,Poncho,2383.0,10-04-2023,2.5,Credit Card,0
-4017,Gloves,2895.0,17-07-2023,3.6,Credit Card,0
-4001,Trench Coat,2952.0,13-06-2023,2.2,Cash,1
-3976,Slippers,4069.0,18-06-2023,4.9,Credit Card,0
-4094,Raincoat,54.0,18-02-2023,4.9,Credit Card,0
-4011,Gloves,121.0,20-06-2023,2.5,Credit Card,1
-4030,Camisole,94.0,08-07-2023,1.0,Credit Card,0
-4024,Sneakers,34.0,16-12-2022,1.9,Credit Card,1
-3969,Hat,20.0,01-12-2022,1.9,Cash,1
-4033,Sandals,187.0,31-03-2023,4.5,Credit Card,0
-4103,Jeans,131.0,20-07-2023,3.1,Credit Card,0
-4059,Polo Shirt,29.0,21-05-2023,1.8,Credit Card,1
-4014,Wallet,81.0,14-06-2023,3.4,Credit Card,0
-4116,Jumpsuit,154.0,06-02-2023,2.2,Cash,0
-3980,Jumpsuit,55.0,24-06-2023,4.5,Credit Card,1
-4105,Slippers,90.0,09-04-2023,4.5,Cash,0
-3981,Skirt,,20-02-2023,1.0,Cash,0
-4108,Camisole,46.0,01-10-2023,1.8,Cash,0
-4117,Jeans,85.0,01-01-2024,4.5,Credit Card,1
-4118,Shirt,45.0,01-01-2024,3.2,Cash,0
-4119,Dress,120.0,01-01-2024,4.8,Debit Card,1
-4120,Shoes,95.0,01-01-2024,4.2,Credit Card,1
-4121,Jacket,150.0,01-01-2024,3.8,Credit Card,0
-4122,Jeans,78.0,01-01-2024,4.6,Cash,1
-4123,Shirt,42.0,01-01-2024,2.9,Cash,0
-4124,Dress,135.0,01-01-2024,4.9,Debit Card,1
-4125,Shoes,88.0,01-01-2024,4.1,Credit Card,1
-4126,Jacket,165.0,01-01-2024,3.5,Credit Card,0
-4127,Jeans,92.0,01-01-2024,4.7,Cash,1
-4128,Shirt,38.0,01-01-2024,3.1,Cash,0
-4129,Dress,110.0,01-01-2024,4.4,Debit Card,1
-4130,Shoes,105.0,01-01-2024,4.3,Credit Card,1
-4131,Jacket,140.0,01-01-2024,3.9,Credit Card,0
-4132,Jeans,75.0,01-01-2024,4.8,Cash,1
-4133,Shirt,48.0,01-01-2024,2.8,Cash,0
-4134,Dress,125.0,01-01-2024,4.6,Debit Card,1
-4135,Shoes,98.0,01-01-2024,4.0,Credit Card,1
-4136,Jacket,155.0,01-01-2024,3.7,Credit Card,0
-4137,Jeans,89.0,01-01-2024,4.5,Cash,1
-4138,Shirt,41.0,01-01-2024,3.0,Cash,0
-4139,Dress,145.0,01-01-2024,4.7,Debit Card,1
-4140,Shoes,82.0,01-01-2024,4.4,Credit Card,1
-4141,Jacket,175.0,01-01-2024,3.6,Credit Card,0
-4142,Jeans,95.0,01-01-2024,4.9,Cash,1
-4143,Shirt,35.0,01-01-2024,2.7,Cash,0
-4144,Dress,115.0,01-01-2024,4.8,Debit Card,1
-4145,Shoes,108.0,01-01-2024,4.2,Credit Card,1
-4146,Jacket,160.0,01-01-2024,3.8,Credit Card,0
+Customer Reference ID,Item Purchased,Purchase Amount (USD),Date Purchase,Review Rating,Payment Method,Will_Return,Purchase Amount (USD
+4145,Shoes,108.0,01-01-2024,4.2,Credit Card,1,
+4141,Jacket,175.0,01-01-2024,3.6,Credit Card,0,
+4018,Handbag,4619.0,05-02-2023,3.6,Credit Card,0,
+4127,Jeans,92.0,01-01-2024,4.7,Cash,1,
+4080,Onesie,2914.0,11-12-2022,4.5,Credit Card,1,
+4120,Shoes,95.0,01-01-2024,4.2,Credit Card,1,
+4017,Gloves,2895.0,17-07-2023,3.6,Credit Card,0,
+4068,Pajamas,3728.0,09-12-2022,2.5,Credit Card,1,
+4103,Jeans,131.0,20-07-2023,3.1,Credit Card,0,
+4144,Dress,115.0,01-01-2024,4.8,Debit Card,1,
+4139,Dress,145.0,01-01-2024,4.7,Debit Card,1,
+4010,Loafers,4233.0,11-06-2023,3.0,Credit Card,0,
+4124,Dress,135.0,01-01-2024,4.9,Debit Card,1,
+4102,Trench Coat,2130.0,29-01-2023,4.8,Cash,0,
+4118,Shirt,45.0,01-01-2024,3.2,Cash,0,
+4133,Shirt,48.0,01-01-2024,2.8,Cash,0,
+4097,Leggings,3126.0,15-03-2023,3.2,Cash,1,
+4001,Trench Coat,2952.0,13-06-2023,2.2,Cash,1,
+5000,Jeans,,23-08-2023,4.8,Credit Card,0,1547.0
+5000,Shirt,,20-08-2023,4.5,Credit Card,0,883.0
+5001,Jeans,,24-10-2023,4.5,Debit Card,0,1359.0
+5001,Shirt,,04-12-2023,4.0,Debit Card,1,2229.0
+5002,Jeans,,10-04-2023,4.2,Credit Card,0,753.0
+5002,Shirt,,21-06-2023,4.8,Debit Card,0,2039.0
+5003,Jeans,,27-12-2023,4.5,Debit Card,0,2401.0
+5003,Shirt,,12-06-2023,4.8,Debit Card,1,2922.0
+5004,Jeans,,17-02-2023,4.0,Debit Card,0,2068.0
+5004,Shirt,,18-01-2023,4.2,Cash,0,1888.0
+5005,Jeans,,25-02-2023,3.5,Debit Card,1,1872.0
+5005,Shirt,,11-04-2023,4.2,Cash,1,2240.0
+5006,Jeans,,02-02-2023,4.5,Credit Card,0,2544.0
+5006,Shirt,,14-09-2023,4.8,Debit Card,0,1317.0
+5007,Jeans,,06-02-2023,3.5,Cash,1,502.0
+5007,Shirt,,07-02-2023,4.2,Debit Card,1,822.0
+5008,Jeans,,07-07-2023,3.5,Cash,1,2713.0
+5008,Shirt,,10-05-2023,4.0,Credit Card,1,1488.0
+5009,Jeans,,16-03-2023,4.0,Debit Card,0,2226.0
+5009,Shirt,,13-12-2023,4.5,Credit Card,1,1536.0
+5010,Jeans,,26-05-2023,4.2,Debit Card,0,1754.0
+5010,Shirt,,11-08-2023,3.5,Credit Card,1,2269.0
+5011,Jeans,,19-10-2023,4.0,Credit Card,0,2409.0
+5011,Shirt,,15-04-2023,4.2,Cash,0,2205.0
+5012,Jacket,,21-07-2023,3.5,Cash,1,570.0
+5012,Shoes,,21-03-2023,4.2,Debit Card,0,1381.0
+5013,Jacket,,16-01-2023,4.2,Credit Card,0,2087.0
+5013,Shoes,,12-03-2023,4.0,Cash,0,2631.0
+5014,Jacket,,23-06-2023,4.8,Credit Card,0,1262.0
+5014,Shoes,,24-01-2023,4.8,Cash,0,1284.0
+5015,Jacket,,11-02-2023,3.5,Cash,1,2975.0
+5015,Shoes,,02-03-2023,4.0,Debit Card,1,2806.0
+5016,Jacket,,08-05-2023,3.5,Credit Card,1,2130.0
+5016,Shoes,,02-09-2023,4.2,Debit Card,0,2774.0
+5017,Jacket,,05-02-2023,4.5,Cash,0,1107.0
+5017,Shoes,,21-02-2023,4.5,Cash,1,2358.0
+5018,Jacket,,11-04-2023,4.0,Cash,0,548.0
+5018,Shoes,,07-01-2023,4.0,Debit Card,0,2783.0
+5019,Jacket,,10-06-2023,4.5,Cash,0,545.0
+5019,Shoes,,25-01-2023,4.8,Debit Card,1,1625.0
+5020,Jacket,,27-10-2023,3.5,Cash,1,2133.0
+5020,Shoes,,10-06-2023,3.5,Credit Card,0,888.0
+5021,Jacket,,14-06-2023,3.5,Cash,1,2029.0
+5021,Shoes,,24-01-2023,4.2,Credit Card,1,888.0
+5022,Jacket,,04-08-2023,4.8,Cash,0,791.0
+5022,Shoes,,01-03-2023,3.5,Debit Card,1,2438.0
+5023,Jacket,,19-10-2023,4.5,Debit Card,1,2072.0
+5023,Shoes,,12-04-2023,4.8,Cash,1,1853.0
+5024,Dress,,07-04-2023,4.5,Credit Card,1,1929.0
+5024,Handbag,,18-01-2023,3.5,Debit Card,0,2986.0
+5025,Dress,,05-10-2023,4.5,Cash,1,691.0
+5025,Handbag,,24-07-2023,4.8,Cash,0,1142.0
+5026,Dress,,20-05-2023,4.0,Cash,0,923.0
+5026,Handbag,,16-01-2023,4.8,Cash,0,2744.0
+5027,Dress,,02-04-2023,4.0,Debit Card,0,1160.0
+5027,Handbag,,23-05-2023,4.2,Credit Card,0,2383.0
+5028,Dress,,24-06-2023,4.5,Credit Card,1,1126.0
+5028,Handbag,,17-03-2023,3.5,Cash,1,1608.0
+5029,Dress,,11-03-2023,4.0,Cash,0,2020.0
+5029,Handbag,,21-10-2023,4.0,Debit Card,0,1856.0
+5030,Dress,,01-02-2023,4.2,Cash,1,2078.0
+5030,Handbag,,24-11-2023,4.0,Cash,1,665.0
+5031,Dress,,19-03-2023,4.2,Cash,0,2749.0
+5031,Handbag,,05-09-2023,3.5,Credit Card,0,2699.0
+5032,Dress,,23-06-2023,4.2,Cash,0,1673.0
+5032,Handbag,,01-03-2023,4.5,Debit Card,0,2324.0
+5033,Dress,,04-04-2023,4.5,Credit Card,0,1464.0
+5033,Handbag,,04-11-2023,3.5,Credit Card,0,2148.0
+5034,Wallet,,26-01-2023,4.0,Debit Card,0,2367.0
+5034,Shoes,,21-11-2023,4.8,Credit Card,1,2491.0
+5035,Wallet,,16-08-2023,4.5,Cash,1,2311.0
+5035,Shoes,,18-03-2023,4.2,Debit Card,0,1799.0
+5036,Wallet,,09-12-2023,4.8,Debit Card,1,1811.0
+5036,Shoes,,16-04-2023,4.0,Credit Card,0,2719.0
+5037,Wallet,,14-11-2023,3.5,Cash,1,1475.0
+5037,Shoes,,09-11-2023,4.0,Credit Card,0,578.0
+5038,Wallet,,07-09-2023,3.5,Credit Card,0,1696.0
+5038,Shoes,,03-02-2023,4.0,Cash,1,710.0
+5039,Wallet,,02-09-2023,4.8,Debit Card,0,2831.0
+5039,Shoes,,20-07-2023,4.2,Debit Card,1,568.0
+5040,Wallet,,19-08-2023,4.2,Cash,1,2620.0
+5040,Shoes,,02-05-2023,4.8,Credit Card,1,661.0
+5041,Wallet,,06-07-2023,4.5,Cash,0,567.0
+5041,Shoes,,03-06-2023,4.5,Debit Card,0,1165.0
+5042,Wallet,,26-09-2023,4.5,Credit Card,0,1055.0
+5042,Shoes,,21-03-2023,4.0,Credit Card,0,933.0
+5043,Wallet,,21-07-2023,4.8,Debit Card,1,1784.0
+5043,Shoes,,12-03-2023,4.0,Cash,1,2900.0
+5044,Shirt,,04-01-2023,3.5,Debit Card,1,909.0
+5044,Jeans,,21-01-2023,4.8,Credit Card,0,803.0
+5044,Shoes,,21-12-2023,4.0,Credit Card,1,2848.0
+5045,Shirt,,15-07-2023,3.5,Credit Card,0,528.0
+5045,Jeans,,22-09-2023,3.5,Debit Card,1,623.0
+5045,Shoes,,17-07-2023,3.5,Credit Card,1,2851.0
+5046,Shirt,,03-01-2023,4.8,Debit Card,1,2888.0
+5046,Jeans,,04-11-2023,4.8,Cash,0,703.0
+5046,Shoes,,17-01-2023,4.8,Cash,0,1732.0
+5047,Shirt,,24-01-2023,4.0,Debit Card,1,1492.0
+5047,Jeans,,08-12-2023,4.8,Cash,0,990.0
+5047,Shoes,,15-08-2023,4.5,Debit Card,0,891.0
+5048,Shirt,,02-10-2023,4.8,Cash,1,2017.0
+5048,Jeans,,07-09-2023,4.2,Debit Card,0,1225.0
+5048,Shoes,,04-12-2023,4.8,Cash,1,1629.0
+5049,Shirt,,07-08-2023,4.2,Debit Card,0,1848.0
+5049,Jeans,,16-09-2023,4.2,Credit Card,0,1134.0
+5049,Shoes,,13-05-2023,4.5,Debit Card,1,1159.0
+5050,Shirt,,08-02-2023,4.5,Credit Card,1,1847.0
+5050,Jeans,,13-07-2023,4.0,Credit Card,0,2541.0
+5050,Shoes,,06-09-2023,4.5,Credit Card,0,2444.0
+5051,Shirt,,10-09-2023,4.2,Credit Card,1,1430.0
+5051,Jeans,,21-01-2023,4.2,Debit Card,1,2837.0
+5051,Shoes,,23-01-2023,4.0,Credit Card,0,1818.0
+5052,Shirt,,08-08-2023,4.2,Credit Card,0,1369.0
+5052,Jeans,,01-10-2023,4.0,Debit Card,1,2959.0
+5052,Shoes,,01-12-2023,4.8,Debit Card,0,2280.0
+5053,Shirt,,18-11-2023,4.8,Credit Card,0,964.0
+5053,Jeans,,01-05-2023,3.5,Debit Card,0,1595.0
+5053,Shoes,,25-12-2023,3.5,Debit Card,1,505.0
+5054,Shirt,,08-02-2023,4.5,Debit Card,1,2738.0
+5054,Jeans,,22-06-2023,4.0,Cash,1,1994.0
+5054,Shoes,,16-09-2023,4.2,Debit Card,0,600.0
+5055,Handbag,,17-07-2023,4.2,Cash,0,675.0
+5055,Wallet,,24-12-2023,3.5,Debit Card,0,2788.0
+5056,Handbag,,11-02-2023,4.5,Debit Card,0,1670.0
+5056,Wallet,,21-09-2023,4.5,Debit Card,0,2091.0
+5057,Handbag,,24-01-2023,4.2,Debit Card,1,2638.0
+5057,Wallet,,15-04-2023,4.2,Debit Card,1,2961.0
+5058,Handbag,,21-01-2023,4.5,Debit Card,0,2217.0
+5058,Wallet,,25-08-2023,4.2,Debit Card,0,1465.0
+5059,Handbag,,21-07-2023,4.8,Credit Card,0,1264.0
+5059,Wallet,,06-05-2023,4.0,Cash,0,2400.0
+5060,Handbag,,06-01-2023,4.8,Cash,0,1187.0
+5060,Wallet,,21-04-2023,4.0,Debit Card,1,2542.0
+5061,Handbag,,06-04-2023,4.8,Debit Card,1,1830.0
+5061,Wallet,,17-12-2023,4.5,Debit Card,1,1402.0
+5062,Handbag,,14-01-2023,4.5,Debit Card,1,2004.0
+5062,Wallet,,14-03-2023,4.0,Credit Card,0,2821.0
+5063,Handbag,,23-07-2023,4.5,Cash,1,768.0
+5063,Wallet,,03-12-2023,4.8,Cash,1,2837.0
+5064,Dress,,24-09-2023,3.5,Credit Card,0,1396.0
+5064,Shoes,,10-11-2023,3.5,Credit Card,1,2291.0
+5064,Handbag,,03-08-2023,4.2,Cash,0,2170.0
+5065,Dress,,08-06-2023,3.5,Cash,0,2388.0
+5065,Shoes,,23-01-2023,3.5,Cash,1,651.0
+5065,Handbag,,11-10-2023,4.2,Debit Card,1,1745.0
+5066,Dress,,16-05-2023,4.5,Credit Card,1,1617.0
+5066,Shoes,,05-11-2023,4.0,Credit Card,0,2927.0
+5066,Handbag,,20-03-2023,4.8,Cash,1,2647.0
+5067,Dress,,27-10-2023,4.8,Debit Card,1,1548.0
+5067,Shoes,,04-08-2023,4.5,Debit Card,0,1857.0
+5067,Handbag,,15-03-2023,3.5,Cash,0,1161.0
+5068,Dress,,04-09-2023,4.0,Credit Card,1,2585.0
+5068,Shoes,,03-12-2023,4.2,Credit Card,1,1280.0
+5068,Handbag,,09-02-2023,3.5,Debit Card,0,1859.0
+5069,Dress,,21-07-2023,4.0,Credit Card,0,1393.0
+5069,Shoes,,26-10-2023,3.5,Debit Card,1,890.0
+5069,Handbag,,04-07-2023,4.8,Credit Card,1,1299.0
+5070,Dress,,13-07-2023,4.0,Cash,1,1059.0
+5070,Shoes,,16-01-2023,4.0,Credit Card,1,2954.0
+5070,Handbag,,10-11-2023,4.0,Credit Card,0,2455.0
+5071,Dress,,08-10-2023,4.5,Credit Card,1,2810.0
+5071,Shoes,,05-05-2023,4.0,Cash,0,532.0
+5071,Handbag,,20-12-2023,4.0,Cash,1,1903.0
+5072,Dress,,01-11-2023,4.2,Debit Card,1,1171.0
+5072,Shoes,,13-06-2023,4.8,Cash,1,729.0
+5072,Handbag,,03-03-2023,4.8,Cash,0,1944.0
+5073,Jacket,,22-05-2023,4.0,Debit Card,1,2985.0
+5074,Shoes,,05-02-2023,4.5,Credit Card,1,2945.0
+5075,Wallet,,09-11-2023,4.2,Cash,0,1788.0
+5076,Dress,,20-03-2023,4.0,Cash,0,1287.0
+5077,Jacket,,18-06-2023,4.2,Debit Card,0,2153.0
+5078,Shirt,,16-07-2023,4.0,Cash,1,2142.0
+5079,Handbag,,04-07-2023,4.0,Debit Card,0,1354.0
+5080,Wallet,,12-10-2023,4.5,Debit Card,0,1022.0
+5081,Jeans,,27-10-2023,4.5,Credit Card,1,1069.0
+5082,Jeans,,12-08-2023,3.5,Cash,1,1633.0
+5083,Shoes,,04-09-2023,4.2,Credit Card,0,2443.0
+5084,Dress,,06-03-2023,4.8,Cash,0,761.0
+5085,Dress,,18-01-2023,4.8,Debit Card,1,1400.0
+5086,Shoes,,10-11-2023,4.2,Debit Card,1,2457.0
+5087,Jeans,,25-07-2023,4.0,Credit Card,1,2410.0
+5088,Dress,,16-05-2023,4.2,Debit Card,0,2959.0
+5089,Shoes,,09-07-2023,4.5,Credit Card,0,2644.0
+5090,Jacket,,13-06-2023,4.0,Credit Card,1,1156.0
+5091,Dress,,11-08-2023,4.8,Credit Card,0,1484.0
+5092,Jeans,,25-08-2023,4.5,Credit Card,1,2687.0
