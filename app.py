@@ -16,18 +16,9 @@ st.set_page_config(page_title="Ứng Dụng Khai Thác Dữ Liệu Trong Lĩnh V
 @st.cache_data
 def load_fashion_retail_data() -> pd.DataFrame:
     try:
-        # Sử dụng dữ liệu thống nhất
         return load_csv("data/datasets/Fashion_Retail_Sales.csv")
     except Exception:
         return pd.DataFrame()
-
-@st.cache_data
-def load_default_customers() -> pd.DataFrame:
-    try:
-        return load_csv("data/datasets/customers.csv")
-    except Exception:
-        return pd.DataFrame()
-
 
 def sidebar_controls():
     st.sidebar.header("Chọn thuật toán")
